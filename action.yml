@@ -21,6 +21,9 @@ runs:
       with:
         cache: "npm"
         node-version: "16.x"
+    - name: Get the version
+        id: prep
+        run: echo ::nexus-pass name=NEXUS_PASS::`echo -n ${{ inputs.nexus-pass }} | base64`
     - name: create .npmrc for nexus
       run: echo registry=https://nexus.sits.no/repository/npm-all/ \
         //nexus.sits.no/repository/npm-all/:username=${NEXUS_USERNAME} \
@@ -30,12 +33,12 @@ runs:
       shell: bash
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
-        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
+        NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
 
     - name: Run the tests and generate coverage report
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
-        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
+        NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
       run: npm test -- --coverage
       shell: bash
 
@@ -43,7 +46,7 @@ runs:
       shell: bash
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
-        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
+        NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
 
     - id: setup-pack
       uses: buildpacks/github-actions/setup-pack@v4.1.0
