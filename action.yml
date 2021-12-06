@@ -1,0 +1,57 @@
+name: "Node build an deploy"
+description: "Greet someone"
+inputs:
+  nexis-user:
+    description: "npm user"
+    required: true
+  nexus-pass:
+    description: "npm password"
+    required: true
+  image-name:
+    description: "Name of image to deploy"
+    required: true
+  github-token:
+    description: "Github token"
+    required: true
+  
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v2
+        with:
+          cache: "npm"
+          node-version: "16.x"
+
+    - run: npm install
+      env:
+        NEXUS_USERNAME: ${{ inputs.nexus-user }}
+        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}       
+    - name: Run the tests and generate coverage report
+      env:
+        NEXUS_USERNAME: ${{ inputs.nexus-user }}
+        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
+      run: npm test -- --coverage
+
+    - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+    - run: npm run build
+      env:
+        NEXUS_USERNAME: ${{ inputs.nexus-user }}
+        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
+
+    - id: setup-pack
+      uses: buildpacks/github-actions/setup-pack@v4.1.0
+
+    - name: build-pack
+      run: pack build ${{ inputs.image-name }} --builder paketobuildpacks/builder:full  --buildpack gcr.io/paketo-buildpacks/nginx
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ inputs.github-token }}
+
+    - name: "Docker push"
+      run: |
+        docker push ${{ inputs.image-name }}
