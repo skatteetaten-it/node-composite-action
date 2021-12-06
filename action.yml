@@ -25,6 +25,10 @@ runs:
       id: prep
       run: echo ::set-output name=NEXUS_PASS::`echo -n ${{ inputs.nexus-pass }} | base64`
       shell: bash
+    - name: test nexus pass
+      id: prep
+      run: echo "pass ${{ steps.prep.outputs.NEXUS_PASS }}"
+      shell: bash
     - name: create .npmrc for nexus
       run: echo registry=https://nexus.sits.no/repository/npm-all/ \
         //nexus.sits.no/repository/npm-all/:username=${NEXUS_USERNAME} \
