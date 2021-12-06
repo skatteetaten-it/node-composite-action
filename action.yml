@@ -23,9 +23,10 @@ runs:
         node-version: "16.x"
     - name: encode nexus pass
       id: prep
-      run: NEXUS_PASS= `echo -n ${{ inputs.nexus-pass }} | base64`
-      run: echo ::add-mask::$NEXUS_PASS`
-      run: echo ::set-output name=NEXUS_PASS::$NEXUS_PASS`
+      run: |
+        NEXUS_PASS= `echo -n ${{ inputs.nexus-pass }} | base64`
+        echo ::add-mask::$NEXUS_PASS`
+        echo ::set-output name=NEXUS_PASS::$NEXUS_PASS`
       shell: bash
     - name: test nexus pass
       id: prep
