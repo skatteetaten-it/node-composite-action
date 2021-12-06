@@ -1,7 +1,7 @@
 name: "Node build an deploy"
 description: "Greet someone"
 inputs:
-  nexis-user:
+  nexus-user:
     description: "npm user"
     required: true
   nexus-pass:
