@@ -49,6 +49,7 @@ runs:
 
     - name: build-pack
       run: pack build ${{ inputs.image-name }} --builder paketobuildpacks/builder:full  --buildpack gcr.io/paketo-buildpacks/nginx
+      shell: bash
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
@@ -60,3 +61,4 @@ runs:
     - name: "Docker push"
       run: |
         docker push ${{ inputs.image-name }}
+      shell: bash
