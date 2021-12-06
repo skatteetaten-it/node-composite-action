@@ -29,7 +29,6 @@ runs:
         echo ::set-output name=NEXUS_PASS::$NEXUS_PASS`
       shell: bash
     - name: test nexus pass
-      id: prep
       run: echo "pass ${{ steps.prep.outputs.NEXUS_PASS }}"
       shell: bash
     - name: create .npmrc for nexus
