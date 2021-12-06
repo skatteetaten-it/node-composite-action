@@ -13,7 +13,7 @@ inputs:
   github-token:
     description: "Github token"
     required: true
-  
+
 runs:
   using: "composite"
   steps:
@@ -26,18 +26,18 @@ runs:
       shell: bash
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
-        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}       
-    
+        NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
+
     - name: Run the tests and generate coverage report
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ inputs.nexus-pass }}
       run: npm test -- --coverage
       shell: bash
-    
+
     - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-    
+      uses: codecov/codecov-action@v1
+
     - run: npm run build
       shell: bash
       env:
