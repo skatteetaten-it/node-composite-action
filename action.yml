@@ -19,7 +19,7 @@ runs:
   steps:
     - uses: actions/setup-node@v2
       with:
-        cache: "npm"
+        # cache: "npm"
         node-version: "16.x"
     - name: encode nexus pass
       id: prep
