@@ -25,8 +25,8 @@ runs:
       id: prep
       run: |
         NEXUS_PASS=`echo -n ${{ inputs.nexus-pass }} | base64`
-        echo ::add-mask::$NEXUS_PASS`
-        echo ::set-output name=NEXUS_PASS::$NEXUS_PASS`
+        echo ::add-mask::$NEXUS_PASS
+        echo ::set-output name=NEXUS_PASS::$NEXUS_PASS
       shell: bash
     - name: test nexus pass
       run: echo "pass ${{ steps.prep.outputs.NEXUS_PASS }}"
