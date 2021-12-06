@@ -35,9 +35,6 @@ runs:
       run: npm test -- --coverage
       shell: bash
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-
     - run: npm run build
       shell: bash
       env:
