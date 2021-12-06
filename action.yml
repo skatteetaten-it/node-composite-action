@@ -21,7 +21,11 @@ runs:
       with:
         cache: "npm"
         node-version: "16.x"
-
+    - name: create .npmrc for nexus
+      run: echo registry=https://nexus.sits.no/repository/npm-all/ \
+        //nexus.sits.no/repository/npm-all/:username=${NEXUS_USERNAME} \
+        //nexus.sits.no/repository/npm-all/:_password=${NEXUS_PASSWORD} > .npmrc
+      shell: bash
     - run: npm install
       shell: bash
       env:
