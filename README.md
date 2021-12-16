@@ -20,11 +20,11 @@ jobs:
         uses: actions/checkout@v2
       - name: Hent versjon fra branch
         id: prep
-        uses: skatteetaten-trial/mvn-composite-action/version@main
+        uses: skatteetaten-it/mvn-composite-action/version@v1
         with:
           type: "branch"
 
-      - uses: skatteetaten-trial/node-composite-action@main
+      - uses: skatteetaten-it/node-composite-action@v1
         with:
           nexus-user: ${{ secrets.NEXUS_USERNAME }}
           nexus-pass: ${{ secrets.NEXUS_PASSWORD }}
@@ -52,10 +52,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Hent versjon
         id: prep
-        uses: skatteetaten-trial/mvn-composite-action/version@main
+        uses: skatteetaten-ittrial/mvn-composite-action/version@v1
         with:
           type: "release"
-      - uses: skatteetaten-trial/node-composite-action@main
+      - uses: skatteetaten-it/node-composite-action@v1
         with:
           nexus-user: ${{ secrets.NEXUS_USERNAME }}
           nexus-pass: ${{ secrets.NEXUS_PASSWORD }}
