@@ -28,7 +28,7 @@ jobs:
         with:
           nexus-user: ${{ secrets.NEXUS_USERNAME }}
           nexus-pass: ${{ secrets.NEXUS_PASSWORD }}
-          image-name: ghcr.io/skatteetaten-trial/skyklar-pilot/referanse-web:${{ steps.prep.outputs.version }}
+          image-name: ghcr.io/skatteetaten-it/skyklar-pilot/referanse-web:${{ steps.prep.outputs.version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
@@ -52,14 +52,14 @@ jobs:
         uses: actions/checkout@v2
       - name: Hent versjon
         id: prep
-        uses: skatteetaten-ittrial/mvn-composite-action/version@v1
+        uses: skatteetaten-it/mvn-composite-action/version@v1
         with:
           type: "release"
       - uses: skatteetaten-it/node-composite-action@v1
         with:
           nexus-user: ${{ secrets.NEXUS_USERNAME }}
           nexus-pass: ${{ secrets.NEXUS_PASSWORD }}
-          image-name: ghcr.io/skatteetaten-trial/skyklar-pilot/referanse-web:${{ steps.prep.outputs.version }}
+          image-name: ghcr.io/skatteetaten-it/skyklar-pilot/referanse-web:${{ steps.prep.outputs.version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
