@@ -28,10 +28,10 @@ runs:
         cache: "npm"
         node-version: "16.x"
     - name: Hent versjon fra branch
-        id: prep
-        uses: skatteetaten-it/mvn-composite-action/version@v1
-        with:
-          type: ${{ inputs.type }}
+      id: prep
+      uses: skatteetaten-it/mvn-composite-action/version@v1
+      with:
+        type: ${{ inputs.type }}
     - name: encode nexus pass
       id: prep
       run: |
