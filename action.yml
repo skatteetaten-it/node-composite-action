@@ -1,11 +1,14 @@
 name: "Node build an deploy"
-description: "Greet someone"
+description: "Node build an deploy"
 inputs:
   nexus-user:
     description: "npm user"
     required: true
   nexus-pass:
     description: "npm password"
+    required: true
+  sonar-token:
+    description: "sonar token"
     required: true
   image-name:
     description: "Name of image to deploy"
@@ -41,7 +44,14 @@ runs:
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
-      run: npm test -- --coverage
+      run: npm run test:coverage
+      shell: bash
+    - name: Run the tests and generate coverage report
+      env:
+        NEXUS_USERNAME: ${{ inputs.nexus-user }}
+        NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+      run: npm run sonarqube
       shell: bash
 
     - run: npm run build
