@@ -19,10 +19,23 @@ inputs:
   github-token:
     description: "Github token"
     required: true
+  nexusiq-username:
+    description: "nexusiq-username"
+    required: true
+  nexusiq-password:
+    description: "nexusiq-password"
+    required: true
+  nexusiq-applicationid:
+    description: "nexusiq-applicationid"
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions/setup-node@v2
       with:
         cache: "npm"
@@ -61,6 +74,16 @@ runs:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       run: npm run sonarqube
       shell: bash
+    - name: Nexus IQ Policy Evaluation
+      if: contains(github.ref, '/dependabot/') != true
+      uses: sonatype-nexus-community/iq-github-action@1.1.0
+      with:
+        serverUrl: https://iq.aurora.skead.no/
+        username: ${{ inputs.nexusiq-username }}
+        password: ${{ inputs.nexusiq-password }}
+        applicationId: ${{ inputs.nexusiq-applicationid }}
+        stage: ${{ inputs.type == 'release' && 'Release' || 'Build' }}
+        target: ./package-lock.json
 
     - run: npm run build
       shell: bash
