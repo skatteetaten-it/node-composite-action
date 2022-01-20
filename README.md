@@ -1,4 +1,4 @@
-# node-composite-action
+# node-composite-action 
 
 Denne bygger, kjører tester, og deployer en statisk webapplikasjon basert på npm til azure.
 
