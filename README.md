@@ -69,7 +69,7 @@ Denne bygger, kjører tester, publiser til sonar og deployer en statisk webappli
 
 parametre er:
 
-- nexus-user (Nexus brukernavn, skal være en secret)
+- nexus-user (Nexus brukernavn, skal være en secret) 
 - nexus-pass (Nexus passord, skal være en secret)
 - github-token (github token, er en secret som kommer fra github)
 - image-name (lokasjon til docker image som blir bygd, denne bør inneholde et versjonsnummer, se skatteetaten-it/mvn-composite-action/version)
