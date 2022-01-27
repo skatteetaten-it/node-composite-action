@@ -95,7 +95,7 @@ runs:
       uses: buildpacks/github-actions/setup-pack@v4.1.0
 
     - name: build-pack
-      run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.version }} --builder paketobuildpacks/builder:base  --buildpack gcr.io/paketo-buildpacks/nginx
+      run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.version }} --builder paketobuildpacks/builder:tiny  --buildpack gcr.io/paketo-buildpacks/nginx
       shell: bash
 
     - name: Login to GitHub Container Registry
