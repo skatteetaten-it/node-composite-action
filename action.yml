@@ -92,7 +92,7 @@ runs:
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
 
     - id: setup-pack
-      uses: buildpacks/github-actions/setup-pack@v4.1.0
+      uses: buildpacks/github-actions/setup-pack@v4.6.0
 
     - name: build-pack
       run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.version }} --builder paketobuildpacks/builder:base  --buildpack gcr.io/paketo-buildpacks/nginx
