@@ -54,7 +54,7 @@ runs:
         node-version: "16.x"
     - name: Hent versjon fra branch
       id: version
-      uses: skatteetaten-it/node-composite-action/version@npm_publish
+      uses: skatteetaten-it/node-composite-action/version@v2
       with:
         type: ${{ inputs.type }}
     - name: encode nexus pass
