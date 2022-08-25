@@ -76,8 +76,7 @@ runs:
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
-      with:
-        working-directory: ${{ inputs.working-directory}}
+      working-directory: ${{ inputs.working-directory}}
 
     - name: Run the tests and generate coverage report
       env:
