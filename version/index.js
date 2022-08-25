@@ -9,10 +9,14 @@ function findMatch(ref, searchParam) {
 function run() {
   let ref = github.context.ref;
   const type = core.getInput("type", { required: true });
-  let version = findMatch(ref, "refs/tags/(.*)");
-
-  if (!version) {
-    core.setFailed("Could not find version: " + type + " (ref: " + ref + ")");
+  let version;
+  if (type == "release") {
+    version = findMatch(ref, "refs/tags/(.*)");
+  } else if (type == "branch") {
+    version = findMatch(ref, "refs/heads/(.*)");
+  } else {
+    core.setFailed("Invalid type: " + type + " (type is: branch, release)");
+    return;
   }
 
   var branch = findMatch(ref, "refs/heads/(.*)");
@@ -20,12 +24,12 @@ function run() {
 
   core.setOutput(
     "dockerversion",
-    type == "branch" ? branch + "-" + github.context.runNumber : version
+    type == "branch" ? version + "-" + github.context.runNumber : version
   );
   core.setOutput(
     "npmversion",
     type == "branch"
-      ? version + "." + branch + "-" + github.context.runNumber
+      ? "0.0.1." + version + "-" + github.context.runNumber
       : version
   );
 }
