@@ -32,7 +32,7 @@ function run() {
   core.setOutput(
     "npmversion",
     type == "branch"
-      ? "0.0.1." + version + "-" + github.context.runNumber
+      ? "0.0.1-" + version + "-" + github.context.runNumber
       : version
   );
 }
