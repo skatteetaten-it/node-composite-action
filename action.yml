@@ -40,8 +40,8 @@ inputs:
     description: "Build docker image"
     required: false
     default: true
-  working-dir:
-    description: "Working-dir"
+  working-directory:
+    description: "Working directory"
     required: false
     default: "."
 
