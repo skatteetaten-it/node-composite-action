@@ -100,7 +100,7 @@ runs:
 
     - run: |
         npm run build
-        npm version ${{ steps.version.outputs.npmversion }}
+        npm version ${{ steps.version.outputs.npmversion }} --no-git-tag-version
         npm publish
       shell: bash
       env:
