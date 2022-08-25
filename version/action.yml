@@ -1,0 +1,14 @@
+name: "Get version"
+description: "Get the version number"
+inputs:
+  type:
+    description: "branch, release"
+    required: true
+outputs:
+  dockerversion:
+    description: "The version number for docker"
+  npmversion:
+    description: "The version number for npm"
+runs:
+  using: "node12"
+  main: "index.js"
