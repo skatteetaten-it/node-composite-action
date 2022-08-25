@@ -40,6 +40,10 @@ inputs:
     description: "Build docker image"
     required: false
     default: true
+  working-dir:
+    description: "Working-dir"
+    required: false
+    default: "."
 
 runs:
   using: "composite"
@@ -72,12 +76,16 @@ runs:
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
+      with:
+        working-directory: ${{ inputs.working-directory}}
 
     - name: Run the tests and generate coverage report
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
       run: npm run test:coverage
+      with:
+        working-directory: ${{ inputs.working-directory}}
       shell: bash
     - name: Run the tests and generate coverage report
       if: contains(github.ref, '/dependabot/') != true && inputs.sonar-enabled == 'true'
@@ -86,6 +94,8 @@ runs:
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       run: npm run sonarqube
+      with:
+        working-directory: ${{ inputs.working-directory}}
       shell: bash
     - name: Nexus IQ Policy Evaluation
       if: contains(github.ref, '/dependabot/') != true && inputs.nexusiq-enabled == 'true'
@@ -97,6 +107,7 @@ runs:
         applicationId: ${{ inputs.nexusiq-applicationid }}
         stage: ${{ inputs.type == 'release' && 'Release' || 'Build' }}
         target: ./package-lock.json
+        working-directory: ${{ inputs.working-directory}}
 
     - run: |
         npm run build
@@ -106,6 +117,8 @@ runs:
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
+      with:
+        working-directory: ${{ inputs.working-directory}}
     - id: setup-pack
       if: ${{ inputs.build-docker-image == 'true' }}
       uses: buildpacks/github-actions/setup-pack@v4.6.0
@@ -114,6 +127,8 @@ runs:
       if: ${{ inputs.build-docker-image == 'true' }}
       run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.dockerversion }} --builder paketobuildpacks/builder:base  --buildpack gcr.io/paketo-buildpacks/nginx
       shell: bash
+      with:
+        working-directory: ${{ inputs.working-directory}}
 
     - name: Login to GitHub Container Registry
       if: ${{ inputs.build-docker-image == 'true' }}
@@ -128,3 +143,5 @@ runs:
       run: |
         docker push ${{ inputs.image-name }}:${{ steps.version.outputs.dockerversion }}
       shell: bash
+      with:
+        working-directory: ${{ inputs.working-directory}}
