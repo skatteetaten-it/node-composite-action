@@ -27,6 +27,10 @@ inputs:
     description: "Enable nexus iq"
     required: false
     default: true
+  test-enabled:
+    description: "Run test coverage"
+    required: false
+    default: true
   nexusiq-username:
     description: "nexusiq-username"
     required: false
@@ -86,6 +90,7 @@ runs:
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
 
     - name: Run the tests and generate coverage report
+      if: contains(github.ref, '/dependabot/') != true && inputs.test-enabled == 'true'
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
