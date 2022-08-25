@@ -10,24 +10,36 @@ inputs:
   nexus-pass:
     description: "npm password"
     required: true
+  sonar-enabled:
+    description: "Enable sonar"
+    required: false
+    default: true
   sonar-token:
     description: "sonar token"
-    required: true
+    required: false
   image-name:
     description: "Name of image to deploy"
     required: true
   github-token:
     description: "Github token"
     required: true
+  nexusiq-enabled:
+    description: "Enable nexus iq"
+    required: false
+    default: true
   nexusiq-username:
     description: "nexusiq-username"
-    required: true
+    required: false
   nexusiq-password:
     description: "nexusiq-password"
-    required: true
+    required: false
   nexusiq-applicationid:
     description: "nexusiq-applicationid"
-    required: true
+    required: false
+  build-docker-image:
+    description: "Build docker image"
+    required: false
+    default: true
 
 runs:
   using: "composite"
@@ -42,7 +54,7 @@ runs:
         node-version: "16.x"
     - name: Hent versjon fra branch
       id: version
-      uses: skatteetaten-it/mvn-composite-action/version@v1
+      uses: skatteetaten-it/node-composite-action/version@nmp_publish
       with:
         type: ${{ inputs.type }}
     - name: encode nexus pass
@@ -68,6 +80,7 @@ runs:
       run: npm run test:coverage
       shell: bash
     - name: Run the tests and generate coverage report
+      if: contains(github.ref, '/dependabot/') != true && inputs.sonar-enabled == 'true'
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
@@ -75,7 +88,7 @@ runs:
       run: npm run sonarqube
       shell: bash
     - name: Nexus IQ Policy Evaluation
-      if: contains(github.ref, '/dependabot/') != true
+      if: contains(github.ref, '/dependabot/') != true && inputs.nexusiq-enabled == 'true'
       uses: sonatype-nexus-community/iq-github-action@1.1.0
       with:
         serverUrl: https://iq.aurora.skead.no/
@@ -85,20 +98,25 @@ runs:
         stage: ${{ inputs.type == 'release' && 'Release' || 'Build' }}
         target: ./package-lock.json
 
-    - run: npm run build
+    - run: |
+        npm run build
+        npm version ${{ steps.version.outputs.npmversion }}
+        npm publish
       shell: bash
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
-
     - id: setup-pack
+      if: ${{ inputs.build-docker-image == 'true' }}
       uses: buildpacks/github-actions/setup-pack@v4.6.0
 
     - name: build-pack
-      run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.version }} --builder paketobuildpacks/builder:base  --buildpack gcr.io/paketo-buildpacks/nginx
+      if: ${{ inputs.build-docker-image == 'true' }}
+      run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.dockerversion }} --builder paketobuildpacks/builder:base  --buildpack gcr.io/paketo-buildpacks/nginx
       shell: bash
 
     - name: Login to GitHub Container Registry
+      if: ${{ inputs.build-docker-image == 'true' }}
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
@@ -106,6 +124,7 @@ runs:
         password: ${{ inputs.github-token }}
 
     - name: "Docker push"
+      if: ${{ inputs.build-docker-image == 'true' }}
       run: |
-        docker push ${{ inputs.image-name }}:${{ steps.version.outputs.version }}
+        docker push ${{ inputs.image-name }}:${{ steps.version.outputs.dockerversion }}
       shell: bash
