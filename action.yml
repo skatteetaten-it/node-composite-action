@@ -69,14 +69,16 @@ runs:
         echo ::set-output name=NEXUS_PASS::$NEXUS_PASS
       shell: bash
     - name: create .npmrc for nexus
+      working-directory: ${{ inputs.working-directory}}
       run: cp ${{ github.action_path }}/.npmrc .npmrc
       shell: bash
-    - run: npm install
+    - name: Npm install
+      working-directory: ${{ inputs.working-directory}}
+      run: npm install
       shell: bash
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
-      working-directory: ${{ inputs.working-directory}}
 
     - name: Run the tests and generate coverage report
       env:
