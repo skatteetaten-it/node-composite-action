@@ -27,6 +27,10 @@ inputs:
     description: "Enable nexus iq"
     required: false
     default: true
+  test-enabled:
+    description: "Run test coverage"
+    required: false
+    default: true
   nexusiq-username:
     description: "nexusiq-username"
     required: false
@@ -40,11 +44,20 @@ inputs:
     description: "Build docker image"
     required: false
     default: true
+  working-directory:
+    description: "Working directory"
+    required: false
+    default: "."
+  checkout-code:
+    description: "Check out code"
+    required: false
+    default: true
 
 runs:
   using: "composite"
   steps:
     - name: Checkout code
+      if: inputs.checkout-code == 'true'
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
@@ -65,19 +78,24 @@ runs:
         echo ::set-output name=NEXUS_PASS::$NEXUS_PASS
       shell: bash
     - name: create .npmrc for nexus
+      working-directory: ${{ inputs.working-directory}}
       run: cp ${{ github.action_path }}/.npmrc .npmrc
       shell: bash
-    - run: npm install
+    - name: Npm install
+      working-directory: ${{ inputs.working-directory}}
+      run: npm install
       shell: bash
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
 
     - name: Run the tests and generate coverage report
+      if: inputs.test-enabled == 'true'
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
       run: npm run test:coverage
+      working-directory: ${{ inputs.working-directory}}
       shell: bash
     - name: Run the tests and generate coverage report
       if: contains(github.ref, '/dependabot/') != true && inputs.sonar-enabled == 'true'
@@ -86,9 +104,10 @@ runs:
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       run: npm run sonarqube
+      working-directory: ${{ inputs.working-directory}}
       shell: bash
     - name: Nexus IQ Policy Evaluation
-      if: contains(github.ref, '/dependabot/') != true && inputs.nexusiq-enabled == 'true'
+      if: ${{ contains(github.ref, '/dependabot/') != true && inputs.nexusiq-enabled == 'true' }}
       uses: sonatype-nexus-community/iq-github-action@1.1.0
       with:
         serverUrl: https://iq.aurora.skead.no/
@@ -97,6 +116,7 @@ runs:
         applicationId: ${{ inputs.nexusiq-applicationid }}
         stage: ${{ inputs.type == 'release' && 'Release' || 'Build' }}
         target: ./package-lock.json
+        working-directory: ${{ inputs.working-directory}}
 
     - run: |
         npm run build
@@ -106,6 +126,7 @@ runs:
       env:
         NEXUS_USERNAME: ${{ inputs.nexus-user }}
         NEXUS_PASSWORD: ${{ steps.prep.outputs.NEXUS_PASS }}
+      working-directory: ${{ inputs.working-directory}}
     - id: setup-pack
       if: ${{ inputs.build-docker-image == 'true' }}
       uses: buildpacks/github-actions/setup-pack@v4.6.0
@@ -114,6 +135,7 @@ runs:
       if: ${{ inputs.build-docker-image == 'true' }}
       run: pack build ${{ inputs.image-name }}:${{ steps.version.outputs.dockerversion }} --builder paketobuildpacks/builder:base  --buildpack gcr.io/paketo-buildpacks/nginx
       shell: bash
+      working-directory: ${{ inputs.working-directory}}
 
     - name: Login to GitHub Container Registry
       if: ${{ inputs.build-docker-image == 'true' }}
@@ -128,3 +150,4 @@ runs:
       run: |
         docker push ${{ inputs.image-name }}:${{ steps.version.outputs.dockerversion }}
       shell: bash
+      working-directory: ${{ inputs.working-directory}}
